@@ -1,0 +1,12 @@
+segment_id,segment_name,user_count,baseline_arpu,member_conversion_rate,expected_lifecycle_months,gross_margin_rate
+s01,High Value Users,2400,168,0.18,18,0.32
+s02,Frequent Buyers,5200,96,0.12,14,0.28
+s03,Price Sensitive Users,7800,58,0.09,10,0.22
+s04,New Users,11000,42,0.07,8,0.18
+s05,Dormant Users,4600,36,0.05,6,0.16
+s06,Student Users,3200,45,0.11,12,0.2
+s07,Family Users,1800,136,0.1,16,0.3
+s08,City Active Users,2600,112,0.13,15,0.27
+s09,Trial Users,9000,24,0.08,4,0.15
+s10,VIP Candidates,520,238,0.2,24,0.36
+

@@ -1,0 +1,1039 @@
+{
+  "scenario": "Plus 年卡 会员 ROI 测算",
+  "status": "ok",
+  "message": "已基于 CSV 样例数据完成脚本化测算。",
+  "uploadSummary": [],
+  "pipeline": {
+    "fileManifest": [
+      {
+        "filename": "member_plans.csv",
+        "label": "会员方案数据",
+        "matchedModule": "M02 / rule_engine.py",
+        "rowCount": 10,
+        "status": "已锁定"
+      },
+      {
+        "filename": "user_segments.csv",
+        "label": "用户分层数据",
+        "matchedModule": "M03 / calculator.py",
+        "rowCount": 10,
+        "status": "已锁定"
+      },
+      {
+        "filename": "orders.csv",
+        "label": "订单数据",
+        "matchedModule": "M03 / calculator.py",
+        "rowCount": 20,
+        "status": "已锁定"
+      },
+      {
+        "filename": "benefit_usage.csv",
+        "label": "权益核销数据",
+        "matchedModule": "M02 / rule_engine.py",
+        "rowCount": 20,
+        "status": "已锁定"
+      }
+    ],
+    "scriptRegistry": [
+      {
+        "id": "M01",
+        "name": "数据导入与完整性检查",
+        "module": "data_loader.py",
+        "inputs": [
+          "member_plans.csv",
+          "user_segments.csv",
+          "orders.csv",
+          "benefit_usage.csv"
+        ],
+        "outputs": [
+          "sampleRowCounts",
+          "fileCompleteness"
+        ],
+        "description": "统一读取会员方案、用户分层、订单和权益核销数据。"
+      },
+      {
+        "id": "M02",
+        "name": "会员规则清洗计算层",
+        "module": "rule_engine.py",
+        "inputs": [
+          "member_plans.csv",
+          "benefit_usage.csv"
+        ],
+        "outputs": [
+          "parsedRules"
+        ],
+        "description": "解析会员价格、权益包、核销限制和续费假设。"
+      },
+      {
+        "id": "M03",
+        "name": "增量价值与权益成本测算",
+        "module": "calculator.py",
+        "inputs": [
+          "parsedRules",
+          "user_segments.csv",
+          "orders.csv"
+        ],
+        "outputs": [
+          "memberRevenue",
+          "benefitCost",
+          "incrementalGmv",
+          "memberProfit"
+        ],
+        "description": "按写死公式计算会员收入、权益成本、增量 GMV、毛利、ROI 和 LTV。"
+      },
+      {
+        "id": "M03A",
+        "name": "会员价值重估模型",
+        "module": "advanced_model.py",
+        "inputs": [
+          "calculation",
+          "user_segments.csv",
+          "benefit_usage.csv"
+        ],
+        "outputs": [
+          "memberValueScore",
+          "netSequenceValue",
+          "benefitCrowdingLoss"
+        ],
+        "description": "引入价格敏感度、权益挤压损失、续费质量和模型置信度，评估长期会员价值。"
+      },
+      {
+        "id": "M04",
+        "name": "异常校验与正确率控制",
+        "module": "validator.py",
+        "inputs": [
+          "sampleRowCounts",
+          "calculation"
+        ],
+        "outputs": [
+          "validationIssues"
+        ],
+        "description": "检查缺失字段、异常价格、高成本权益、负 ROI 和续费压力。"
+      },
+      {
+        "id": "M05",
+        "name": "ROI 偏差追溯",
+        "module": "trace_analyzer.py",
+        "inputs": [
+          "calculation"
+        ],
+        "outputs": [
+          "riskLevel",
+          "drivers"
+        ],
+        "description": "解释 ROI 受哪些因素影响，例如权益核销率、会员价格和续费率。"
+      },
+      {
+        "id": "M06",
+        "name": "AI 建议与复盘报告",
+        "module": "ai_advisor.py + report_generator.py",
+        "inputs": [
+          "defaultPlan",
+          "trace",
+          "validationIssues"
+        ],
+        "outputs": [
+          "aiAdvice",
+          "report"
+        ],
+        "description": "用规则模板生成自然语言建议和结构化复盘。"
+      },
+      {
+        "id": "M07",
+        "name": "产品决策与实验设计",
+        "module": "product_strategy.py",
+        "inputs": [
+          "plans",
+          "advancedMetrics",
+          "validationIssues"
+        ],
+        "outputs": [
+          "decisionSummary",
+          "experimentPlan",
+          "metricGuardrails"
+        ],
+        "description": "将测算结果转成上线建议、用户分层机会、实验设计和指标护栏。"
+      }
+    ],
+    "scriptMatches": [
+      {
+        "id": "M01",
+        "name": "数据导入与完整性检查",
+        "module": "data_loader.py",
+        "inputs": [
+          "member_plans.csv",
+          "user_segments.csv",
+          "orders.csv",
+          "benefit_usage.csv"
+        ],
+        "outputs": [
+          "sampleRowCounts",
+          "fileCompleteness"
+        ],
+        "description": "统一读取会员方案、用户分层、订单和权益核销数据。",
+        "matchedInputs": 4,
+        "totalFileInputs": 4,
+        "status": "可执行"
+      },
+      {
+        "id": "M02",
+        "name": "会员规则清洗计算层",
+        "module": "rule_engine.py",
+        "inputs": [
+          "member_plans.csv",
+          "benefit_usage.csv"
+        ],
+        "outputs": [
+          "parsedRules"
+        ],
+        "description": "解析会员价格、权益包、核销限制和续费假设。",
+        "matchedInputs": 2,
+        "totalFileInputs": 2,
+        "status": "可执行"
+      },
+      {
+        "id": "M03",
+        "name": "增量价值与权益成本测算",
+        "module": "calculator.py",
+        "inputs": [
+          "parsedRules",
+          "user_segments.csv",
+          "orders.csv"
+        ],
+        "outputs": [
+          "memberRevenue",
+          "benefitCost",
+          "incrementalGmv",
+          "memberProfit"
+        ],
+        "description": "按写死公式计算会员收入、权益成本、增量 GMV、毛利、ROI 和 LTV。",
+        "matchedInputs": 2,
+        "totalFileInputs": 2,
+        "status": "可执行"
+      },
+      {
+        "id": "M03A",
+        "name": "会员价值重估模型",
+        "module": "advanced_model.py",
+        "inputs": [
+          "calculation",
+          "user_segments.csv",
+          "benefit_usage.csv"
+        ],
+        "outputs": [
+          "memberValueScore",
+          "netSequenceValue",
+          "benefitCrowdingLoss"
+        ],
+        "description": "引入价格敏感度、权益挤压损失、续费质量和模型置信度，评估长期会员价值。",
+        "matchedInputs": 2,
+        "totalFileInputs": 2,
+        "status": "可执行"
+      },
+      {
+        "id": "M04",
+        "name": "异常校验与正确率控制",
+        "module": "validator.py",
+        "inputs": [
+          "sampleRowCounts",
+          "calculation"
+        ],
+        "outputs": [
+          "validationIssues"
+        ],
+        "description": "检查缺失字段、异常价格、高成本权益、负 ROI 和续费压力。",
+        "matchedInputs": 0,
+        "totalFileInputs": 0,
+        "status": "可执行"
+      },
+      {
+        "id": "M05",
+        "name": "ROI 偏差追溯",
+        "module": "trace_analyzer.py",
+        "inputs": [
+          "calculation"
+        ],
+        "outputs": [
+          "riskLevel",
+          "drivers"
+        ],
+        "description": "解释 ROI 受哪些因素影响，例如权益核销率、会员价格和续费率。",
+        "matchedInputs": 0,
+        "totalFileInputs": 0,
+        "status": "可执行"
+      },
+      {
+        "id": "M06",
+        "name": "AI 建议与复盘报告",
+        "module": "ai_advisor.py + report_generator.py",
+        "inputs": [
+          "defaultPlan",
+          "trace",
+          "validationIssues"
+        ],
+        "outputs": [
+          "aiAdvice",
+          "report"
+        ],
+        "description": "用规则模板生成自然语言建议和结构化复盘。",
+        "matchedInputs": 0,
+        "totalFileInputs": 0,
+        "status": "可执行"
+      },
+      {
+        "id": "M07",
+        "name": "产品决策与实验设计",
+        "module": "product_strategy.py",
+        "inputs": [
+          "plans",
+          "advancedMetrics",
+          "validationIssues"
+        ],
+        "outputs": [
+          "decisionSummary",
+          "experimentPlan",
+          "metricGuardrails"
+        ],
+        "description": "将测算结果转成上线建议、用户分层机会、实验设计和指标护栏。",
+        "matchedInputs": 0,
+        "totalFileInputs": 0,
+        "status": "可执行"
+      }
+    ],
+    "steps": [
+      {
+        "id": "1",
+        "title": "数据导入",
+        "status": "完成",
+        "summary": "已读取 4 类样例数据，共 60 行。",
+        "logs": [
+          "M01 读取会员方案 10 行。",
+          "M01 读取用户分层 10 行。",
+          "M01 读取订单数据 20 行。",
+          "M01 读取权益核销 20 行。"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "规则清洗",
+        "status": "完成",
+        "summary": "已解析 10 个会员方案，并绑定权益核销规则。",
+        "logs": [
+          "M02 将 plan_id 映射为中文方案名。",
+          "M02 将会员价格、周期、续费率和权益成本转为可计算字段。"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "正式测算",
+        "status": "完成",
+        "summary": "Plus 年卡 ROI 为 4.71x，会员毛利为 197548.0。",
+        "logs": [
+          "M03 计算会员收入 = 会员价格 * 目标会员数。",
+          "M03 计算权益成本 = 权益核销成本 + 会员服务成本。",
+          "M03 计算 ROI = 会员毛利 / 权益成本。",
+          "M03A 计算会员价值分、权益挤压损失、净序列价值和模型置信度。"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "异常校验",
+        "status": "完成",
+        "summary": "共发现 3 条校验提醒。",
+        "logs": [
+          "M04 检查价格、目标会员数、ROI、权益核销率和续费压力。",
+          "M04 将异常项写入 validationIssues，供前端提醒和复盘使用。"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "追溯、报告与产品决策",
+        "status": "完成",
+        "summary": "默认方案风险等级为 low。",
+        "logs": [
+          "Plus 年卡 在样例模型中具备正向收益，会员毛利可以覆盖权益成本。",
+          "样例数据中暂未发现严重成本或续费异常。",
+          "M07 将测算结果转成产品决策建议、实验方案和指标护栏。"
+        ]
+      }
+    ],
+    "runMode": "本地样例数据演示",
+    "dataSourceNote": "当前未上传文件，后端仅读取项目 samples 目录中的 CSV 样例数据。"
+  },
+  "sampleRowCounts": {
+    "memberPlans": 10,
+    "userSegments": 10,
+    "orders": 20,
+    "benefitUsage": 20
+  },
+  "assumptions": {
+    "avgMemberOrder": 134.0,
+    "avgNonMemberOrder": 91.8,
+    "avgMemberMargin": 38.47,
+    "avgNonMemberMargin": 26.76,
+    "avgLifecycleMonths": 12.7
+  },
+  "advancedFormulaCards": [
+    {
+      "title": "价格敏感度指数",
+      "formula": "priceSensitivityIndex = 会员价格 / 加权用户 ARPU / 会员周期",
+      "meaning": "衡量当前定价相对目标用户消费能力是否过高。"
+    },
+    {
+      "title": "权益挤压损失",
+      "formula": "benefitCrowdingLoss = 权益成本 * 核销率 * 动态挤压系数",
+      "meaning": "量化高核销权益对会员净贡献的挤压。"
+    },
+    {
+      "title": "续费质量分",
+      "formula": "renewalQualityScore = 预估续费率 * 加权生命周期 / 12",
+      "meaning": "把续费概率和生命周期合并为长期质量指标。"
+    },
+    {
+      "title": "会员净序列价值",
+      "formula": "netSequenceValue = 会员毛利 - 权益挤压损失 + 续费质量增益",
+      "meaning": "回答一个会员方案进入长期序列后是否真的创造净价值。"
+    }
+  ],
+  "productStrategy": {
+    "decisionSummary": {
+      "recommendation": "建议小流量上线",
+      "reason": "ROI、会员价值分和校验结果均达到灰度标准。",
+      "priorityPlan": "轻量年卡",
+      "expectedROI": 14.69,
+      "memberValueScore": 100
+    },
+    "planDecisions": [
+      {
+        "planId": "lite_annual",
+        "planName": "轻量年卡",
+        "action": "灰度上线",
+        "roi": 14.69,
+        "memberValueScore": 100,
+        "netSequenceValue": 195339.77,
+        "issueCount": 0
+      },
+      {
+        "planId": "trial_monthly",
+        "planName": "体验月卡",
+        "action": "灰度上线",
+        "roi": 8.3,
+        "memberValueScore": 100,
+        "netSequenceValue": 28173.72,
+        "issueCount": 0
+      },
+      {
+        "planId": "student_annual",
+        "planName": "学生年卡",
+        "action": "灰度上线",
+        "roi": 7.56,
+        "memberValueScore": 100,
+        "netSequenceValue": 125558.19,
+        "issueCount": 0
+      },
+      {
+        "planId": "plus_annual",
+        "planName": "Plus 年卡",
+        "action": "灰度上线",
+        "roi": 4.71,
+        "memberValueScore": 91.5,
+        "netSequenceValue": 195952.01,
+        "issueCount": 0
+      },
+      {
+        "planId": "basic_monthly",
+        "planName": "基础月卡",
+        "action": "灰度上线",
+        "roi": 4.03,
+        "memberValueScore": 81.95,
+        "netSequenceValue": 29809.4,
+        "issueCount": 0
+      },
+      {
+        "planId": "plus_quarterly",
+        "planName": "Plus 季卡",
+        "action": "灰度上线",
+        "roi": 3.33,
+        "memberValueScore": 77.44,
+        "netSequenceValue": 64501.94,
+        "issueCount": 0
+      },
+      {
+        "planId": "city_plus",
+        "planName": "城市 Plus 卡",
+        "action": "灰度上线",
+        "roi": 3.04,
+        "memberValueScore": 77.33,
+        "netSequenceValue": 103798.21,
+        "issueCount": 0
+      },
+      {
+        "planId": "premium_annual",
+        "planName": "高级年卡",
+        "action": "调整定价",
+        "roi": 1.66,
+        "memberValueScore": 67.23,
+        "netSequenceValue": 85374.09,
+        "issueCount": 0
+      },
+      {
+        "planId": "family_annual",
+        "planName": "家庭年卡",
+        "action": "调整定价",
+        "roi": 1.12,
+        "memberValueScore": 61.12,
+        "netSequenceValue": 50144.97,
+        "issueCount": 1
+      },
+      {
+        "planId": "vip_annual",
+        "planName": "VIP 年卡",
+        "action": "调整定价",
+        "roi": 0.47,
+        "memberValueScore": 57.7,
+        "netSequenceValue": 18193.5,
+        "issueCount": 2
+      }
+    ],
+    "segmentOpportunities": [
+      {
+        "segmentName": "High Value Users",
+        "opportunityScore": 418.04,
+        "suggestedTactic": "优先推年卡或高阶权益包，强调长期专属权益。"
+      },
+      {
+        "segmentName": "Frequent Buyers",
+        "opportunityScore": 234.82,
+        "suggestedTactic": "用中档权益包做转化实验，观察复购和续费。"
+      },
+      {
+        "segmentName": "VIP Candidates",
+        "opportunityScore": 213.86,
+        "suggestedTactic": "优先推年卡或高阶权益包，强调长期专属权益。"
+      },
+      {
+        "segmentName": "City Active Users",
+        "opportunityScore": 153.32,
+        "suggestedTactic": "用中档权益包做转化实验，观察复购和续费。"
+      },
+      {
+        "segmentName": "Family Users",
+        "opportunityScore": 117.5,
+        "suggestedTactic": "优先推年卡或高阶权益包，强调长期专属权益。"
+      }
+    ],
+    "experimentPlan": [
+      {
+        "name": "价格弹性实验",
+        "hypothesis": "轻微调整价格不会显著降低转化，但能提升单会员净贡献。",
+        "variantA": "当前价格与当前权益包",
+        "variantB": "价格上调 10%，保留核心高感知权益",
+        "primaryMetric": "付费转化率 x 会员毛利",
+        "guardrail": "退款率、投诉率、权益核销成本"
+      },
+      {
+        "name": "权益核销上限实验",
+        "hypothesis": "限制低感知高成本权益，可以降低挤压损失且不明显影响续费。",
+        "variantA": "当前权益核销规则",
+        "variantB": "设置优惠券与免邮使用上限",
+        "primaryMetric": "权益成本率与 ROI",
+        "guardrail": "会员活跃率、复购率"
+      },
+      {
+        "name": "用户分层投放实验",
+        "hypothesis": "高 ARPU 与高生命周期用户对会员价值贡献更稳定。",
+        "variantA": "全量用户统一投放",
+        "variantB": "优先面向高机会分层投放",
+        "primaryMetric": "分层 LTV 与续费率",
+        "guardrail": "获客成本、转化成本"
+      }
+    ],
+    "metricGuardrails": [
+      {
+        "metric": "权益成本率",
+        "target": "权益成本 / 会员收入 <= 80%",
+        "current": 0.25
+      },
+      {
+        "metric": "续费安全线",
+        "target": "预估续费率 >= 盈亏平衡续费率",
+        "current": 0.31
+      },
+      {
+        "metric": "模型置信度",
+        "target": ">= 0.6 后进入大流量",
+        "current": 1
+      },
+      {
+        "metric": "会员价值分",
+        "target": ">= 70 可灰度上线",
+        "current": 100
+      }
+    ],
+    "pmNarrative": [
+      "先用 轻量年卡 作为优先验证方案，因为它在当前样例中会员价值分最高。",
+      "决策不只看 ROI，还同时观察权益挤压损失、续费质量和模型置信度，避免短期盈利掩盖长期风险。",
+      "当前主要追溯结论：Plus 年卡 在样例模型中具备正向收益，会员毛利可以覆盖权益成本。"
+    ]
+  },
+  "metrics": {
+    "memberRevenue": 99000.0,
+    "benefitCost": 41960.0,
+    "incrementalGmv": 506400.0,
+    "memberProfit": 197548.0,
+    "roi": 4.71,
+    "ltv": 209.07,
+    "breakEvenRenewalRate": 0.18
+  },
+  "plans": [
+    {
+      "planId": "basic_monthly",
+      "planName": "基础月卡",
+      "periodMonths": 1,
+      "price": 19.0,
+      "targetMembers": 1200,
+      "expectedRenewalRate": 0.28,
+      "memberRevenue": 22800.0,
+      "benefitCost": 7330.0,
+      "usageCost": 6130.0,
+      "serviceCost": 1200.0,
+      "incrementalGmv": 50640.0,
+      "incrementalOrderMargin": 14050.8,
+      "memberProfit": 29520.8,
+      "roi": 4.03,
+      "ltv": 312.43,
+      "breakEvenRenewalRate": 0.2,
+      "benefitUsageRate": 0.39,
+      "advancedMetrics": {
+        "weightedArpu": 75.03,
+        "weightedMarginRate": 0.23,
+        "priceSensitivityIndex": 0.25,
+        "benefitCrowdingLoss": 400.96,
+        "renewalQualityScore": 0.25,
+        "netSequenceValue": 29809.4,
+        "valueContributionIndex": 3.86,
+        "formulaConfidenceScore": 1,
+        "memberValueScore": 81.95
+      }
+    },
+    {
+      "planId": "plus_quarterly",
+      "planName": "Plus 季卡",
+      "periodMonths": 3,
+      "price": 59.0,
+      "targetMembers": 900,
+      "expectedRenewalRate": 0.36,
+      "memberRevenue": 53100.0,
+      "benefitCost": 19580.0,
+      "usageCost": 16880.0,
+      "serviceCost": 2700.0,
+      "incrementalGmv": 113940.0,
+      "incrementalOrderMargin": 31614.3,
+      "memberProfit": 65134.3,
+      "roi": 3.33,
+      "ltv": 306.37,
+      "breakEvenRenewalRate": 0.23,
+      "benefitUsageRate": 0.47,
+      "advancedMetrics": {
+        "weightedArpu": 75.03,
+        "weightedMarginRate": 0.23,
+        "priceSensitivityIndex": 0.26,
+        "benefitCrowdingLoss": 1297.29,
+        "renewalQualityScore": 0.33,
+        "netSequenceValue": 64501.94,
+        "valueContributionIndex": 3.09,
+        "formulaConfidenceScore": 1,
+        "memberValueScore": 77.44
+      }
+    },
+    {
+      "planId": "plus_annual",
+      "planName": "Plus 年卡",
+      "periodMonths": 12,
+      "price": 99.0,
+      "targetMembers": 1000,
+      "expectedRenewalRate": 0.46,
+      "memberRevenue": 99000.0,
+      "benefitCost": 41960.0,
+      "usageCost": 36960.0,
+      "serviceCost": 5000.0,
+      "incrementalGmv": 506400.0,
+      "incrementalOrderMargin": 140508.0,
+      "memberProfit": 197548.0,
+      "roi": 4.71,
+      "ltv": 209.07,
+      "breakEvenRenewalRate": 0.18,
+      "benefitUsageRate": 0.47,
+      "advancedMetrics": {
+        "weightedArpu": 75.03,
+        "weightedMarginRate": 0.23,
+        "priceSensitivityIndex": 0.11,
+        "benefitCrowdingLoss": 2540.03,
+        "renewalQualityScore": 0.42,
+        "netSequenceValue": 195952.01,
+        "valueContributionIndex": 4.4,
+        "formulaConfidenceScore": 1,
+        "memberValueScore": 91.5
+      }
+    },
+    {
+      "planId": "premium_annual",
+      "planName": "高级年卡",
+      "periodMonths": 12,
+      "price": 199.0,
+      "targetMembers": 420,
+      "expectedRenewalRate": 0.52,
+      "memberRevenue": 83580.0,
+      "benefitCost": 53608.0,
+      "usageCost": 46048.0,
+      "serviceCost": 7560.0,
+      "incrementalGmv": 212688.0,
+      "incrementalOrderMargin": 59013.36,
+      "memberProfit": 88985.36,
+      "roi": 1.66,
+      "ltv": 224.23,
+      "breakEvenRenewalRate": 0.38,
+      "benefitUsageRate": 0.55,
+      "advancedMetrics": {
+        "weightedArpu": 75.03,
+        "weightedMarginRate": 0.23,
+        "priceSensitivityIndex": 0.22,
+        "benefitCrowdingLoss": 4059.48,
+        "renewalQualityScore": 0.47,
+        "netSequenceValue": 85374.09,
+        "valueContributionIndex": 1.48,
+        "formulaConfidenceScore": 1,
+        "memberValueScore": 67.23
+      }
+    },
+    {
+      "planId": "student_annual",
+      "planName": "学生年卡",
+      "periodMonths": 12,
+      "price": 69.0,
+      "targetMembers": 680,
+      "expectedRenewalRate": 0.38,
+      "memberRevenue": 46920.0,
+      "benefitCost": 16640.0,
+      "usageCost": 13920.0,
+      "serviceCost": 2720.0,
+      "incrementalGmv": 344352.0,
+      "incrementalOrderMargin": 95545.44,
+      "memberProfit": 125825.44,
+      "roi": 7.56,
+      "ltv": 195.83,
+      "breakEvenRenewalRate": 0.12,
+      "benefitUsageRate": 0.38,
+      "advancedMetrics": {
+        "weightedArpu": 75.03,
+        "weightedMarginRate": 0.23,
+        "priceSensitivityIndex": 0.08,
+        "benefitCrowdingLoss": 797.55,
+        "renewalQualityScore": 0.35,
+        "netSequenceValue": 125558.19,
+        "valueContributionIndex": 7.2,
+        "formulaConfidenceScore": 1,
+        "memberValueScore": 100
+      }
+    },
+    {
+      "planId": "family_annual",
+      "planName": "家庭年卡",
+      "periodMonths": 12,
+      "price": 249.0,
+      "targetMembers": 260,
+      "expectedRenewalRate": 0.44,
+      "memberRevenue": 64740.0,
+      "benefitCost": 47764.0,
+      "usageCost": 42044.0,
+      "serviceCost": 5720.0,
+      "incrementalGmv": 131664.0,
+      "incrementalOrderMargin": 36532.08,
+      "memberProfit": 53508.08,
+      "roi": 1.12,
+      "ltv": 217.81,
+      "breakEvenRenewalRate": 0.47,
+      "benefitUsageRate": 0.53,
+      "advancedMetrics": {
+        "weightedArpu": 75.03,
+        "weightedMarginRate": 0.23,
+        "priceSensitivityIndex": 0.28,
+        "benefitCrowdingLoss": 3597.89,
+        "renewalQualityScore": 0.4,
+        "netSequenceValue": 50144.97,
+        "valueContributionIndex": 0.98,
+        "formulaConfidenceScore": 1,
+        "memberValueScore": 61.12
+      }
+    },
+    {
+      "planId": "trial_monthly",
+      "planName": "体验月卡",
+      "periodMonths": 1,
+      "price": 9.0,
+      "targetMembers": 1500,
+      "expectedRenewalRate": 0.18,
+      "memberRevenue": 13500.0,
+      "benefitCost": 3340.0,
+      "usageCost": 1840.0,
+      "serviceCost": 1500.0,
+      "incrementalGmv": 63300.0,
+      "incrementalOrderMargin": 17563.5,
+      "memberProfit": 27723.5,
+      "roi": 8.3,
+      "ltv": 234.73,
+      "breakEvenRenewalRate": 0.11,
+      "benefitUsageRate": 0.24,
+      "advancedMetrics": {
+        "weightedArpu": 75.03,
+        "weightedMarginRate": 0.23,
+        "priceSensitivityIndex": 0.12,
+        "benefitCrowdingLoss": 103.88,
+        "renewalQualityScore": 0.16,
+        "netSequenceValue": 28173.72,
+        "valueContributionIndex": 8.18,
+        "formulaConfidenceScore": 1,
+        "memberValueScore": 100
+      }
+    },
+    {
+      "planId": "vip_annual",
+      "planName": "VIP 年卡",
+      "periodMonths": 12,
+      "price": 299.0,
+      "targetMembers": 160,
+      "expectedRenewalRate": 0.58,
+      "memberRevenue": 47840.0,
+      "benefitCost": 47960.0,
+      "usageCost": 42360.0,
+      "serviceCost": 5600.0,
+      "incrementalGmv": 81024.0,
+      "incrementalOrderMargin": 22481.28,
+      "memberProfit": 22361.28,
+      "roi": 0.47,
+      "ltv": 147.91,
+      "breakEvenRenewalRate": 0.68,
+      "benefitUsageRate": 0.62,
+      "advancedMetrics": {
+        "weightedArpu": 75.03,
+        "weightedMarginRate": 0.23,
+        "priceSensitivityIndex": 0.33,
+        "benefitCrowdingLoss": 4358.23,
+        "renewalQualityScore": 0.53,
+        "netSequenceValue": 18193.5,
+        "valueContributionIndex": 0.35,
+        "formulaConfidenceScore": 1,
+        "memberValueScore": 57.7
+      }
+    },
+    {
+      "planId": "city_plus",
+      "planName": "城市 Plus 卡",
+      "periodMonths": 12,
+      "price": 129.0,
+      "targetMembers": 520,
+      "expectedRenewalRate": 0.42,
+      "memberRevenue": 67080.0,
+      "benefitCost": 34696.0,
+      "usageCost": 30536.0,
+      "serviceCost": 4160.0,
+      "incrementalGmv": 263328.0,
+      "incrementalOrderMargin": 73064.16,
+      "memberProfit": 105448.16,
+      "roi": 3.04,
+      "ltv": 214.61,
+      "breakEvenRenewalRate": 0.25,
+      "benefitUsageRate": 0.46,
+      "advancedMetrics": {
+        "weightedArpu": 75.03,
+        "weightedMarginRate": 0.23,
+        "priceSensitivityIndex": 0.14,
+        "benefitCrowdingLoss": 2098.16,
+        "renewalQualityScore": 0.38,
+        "netSequenceValue": 103798.21,
+        "valueContributionIndex": 2.82,
+        "formulaConfidenceScore": 1,
+        "memberValueScore": 77.33
+      }
+    },
+    {
+      "planId": "lite_annual",
+      "planName": "轻量年卡",
+      "periodMonths": 12,
+      "price": 49.0,
+      "targetMembers": 1100,
+      "expectedRenewalRate": 0.31,
+      "memberRevenue": 53900.0,
+      "benefitCost": 13290.0,
+      "usageCost": 9990.0,
+      "serviceCost": 3300.0,
+      "incrementalGmv": 557040.0,
+      "incrementalOrderMargin": 154558.8,
+      "memberProfit": 195168.8,
+      "roi": 14.69,
+      "ltv": 187.78,
+      "breakEvenRenewalRate": 0.06,
+      "benefitUsageRate": 0.32,
+      "advancedMetrics": {
+        "weightedArpu": 75.03,
+        "weightedMarginRate": 0.23,
+        "priceSensitivityIndex": 0.05,
+        "benefitCrowdingLoss": 528.85,
+        "renewalQualityScore": 0.28,
+        "netSequenceValue": 195339.77,
+        "valueContributionIndex": 14.13,
+        "formulaConfidenceScore": 1,
+        "memberValueScore": 100
+      }
+    }
+  ],
+  "alerts": [
+    "家庭年卡 的预估续费率低于盈亏平衡续费率。",
+    "VIP 年卡 的预估续费率低于盈亏平衡续费率。",
+    "VIP 年卡 的权益成本超过会员收入的 80%。"
+  ],
+  "validationIssues": [
+    {
+      "planId": "family_annual",
+      "level": "warning",
+      "message": "家庭年卡 的预估续费率低于盈亏平衡续费率。"
+    },
+    {
+      "planId": "vip_annual",
+      "level": "warning",
+      "message": "VIP 年卡 的预估续费率低于盈亏平衡续费率。"
+    },
+    {
+      "planId": "vip_annual",
+      "level": "warning",
+      "message": "VIP 年卡 的权益成本超过会员收入的 80%。"
+    }
+  ],
+  "trace": {
+    "defaultTrace": {
+      "planId": "plus_annual",
+      "planName": "Plus 年卡",
+      "riskLevel": "low",
+      "drivers": [
+        "Plus 年卡 在样例模型中具备正向收益，会员毛利可以覆盖权益成本。",
+        "样例数据中暂未发现严重成本或续费异常。"
+      ]
+    },
+    "planTraces": [
+      {
+        "planId": "basic_monthly",
+        "planName": "基础月卡",
+        "riskLevel": "low",
+        "drivers": [
+          "基础月卡 在样例模型中具备正向收益，会员毛利可以覆盖权益成本。",
+          "样例数据中暂未发现严重成本或续费异常。"
+        ]
+      },
+      {
+        "planId": "plus_quarterly",
+        "planName": "Plus 季卡",
+        "riskLevel": "low",
+        "drivers": [
+          "Plus 季卡 在样例模型中具备正向收益，会员毛利可以覆盖权益成本。",
+          "样例数据中暂未发现严重成本或续费异常。"
+        ]
+      },
+      {
+        "planId": "plus_annual",
+        "planName": "Plus 年卡",
+        "riskLevel": "low",
+        "drivers": [
+          "Plus 年卡 在样例模型中具备正向收益，会员毛利可以覆盖权益成本。",
+          "样例数据中暂未发现严重成本或续费异常。"
+        ]
+      },
+      {
+        "planId": "premium_annual",
+        "planName": "高级年卡",
+        "riskLevel": "low",
+        "drivers": [
+          "高级年卡 在样例模型中具备正向收益，会员毛利可以覆盖权益成本。",
+          "样例数据中暂未发现严重成本或续费异常。"
+        ]
+      },
+      {
+        "planId": "student_annual",
+        "planName": "学生年卡",
+        "riskLevel": "low",
+        "drivers": [
+          "学生年卡 在样例模型中具备正向收益，会员毛利可以覆盖权益成本。",
+          "样例数据中暂未发现严重成本或续费异常。"
+        ]
+      },
+      {
+        "planId": "family_annual",
+        "planName": "家庭年卡",
+        "riskLevel": "high",
+        "drivers": [
+          "家庭年卡 在样例模型中具备正向收益，会员毛利可以覆盖权益成本。",
+          "预估续费率低于盈亏平衡续费率，说明长期价值存在不确定性。"
+        ]
+      },
+      {
+        "planId": "trial_monthly",
+        "planName": "体验月卡",
+        "riskLevel": "low",
+        "drivers": [
+          "体验月卡 在样例模型中具备正向收益，会员毛利可以覆盖权益成本。",
+          "样例数据中暂未发现严重成本或续费异常。"
+        ]
+      },
+      {
+        "planId": "vip_annual",
+        "planName": "VIP 年卡",
+        "riskLevel": "high",
+        "drivers": [
+          "VIP 年卡 的 ROI 偏弱，主要因为权益成本接近或超过当前可捕获价值。",
+          "权益核销率偏高，是当前方案的主要成本驱动项，建议检查免邮和优惠券限制。",
+          "预估续费率低于盈亏平衡续费率，说明长期价值存在不确定性。",
+          "单会员权益成本高于会员价格，方案需要依赖增量订单毛利来覆盖成本。"
+        ]
+      },
+      {
+        "planId": "city_plus",
+        "planName": "城市 Plus 卡",
+        "riskLevel": "low",
+        "drivers": [
+          "城市 Plus 卡 在样例模型中具备正向收益，会员毛利可以覆盖权益成本。",
+          "样例数据中暂未发现严重成本或续费异常。"
+        ]
+      },
+      {
+        "planId": "lite_annual",
+        "planName": "轻量年卡",
+        "riskLevel": "low",
+        "drivers": [
+          "轻量年卡 在样例模型中具备正向收益，会员毛利可以覆盖权益成本。",
+          "样例数据中暂未发现严重成本或续费异常。"
+        ]
+      }
+    ]
+  },
+  "aiAdvice": [
+    "Plus 年卡 当前 ROI 为 4.71x，预估 LTV 为 209.07。",
+    "样例模型下方案较健康，可以优先验证转化率和续费率。",
+    "样例数据中暂未发现阻塞性校验问题。",
+    "下一步实验：按高价值用户和价格敏感用户分层，对价格、优惠券数量和免邮上限做 A/B 测试。"
+  ],
+  "report": {
+    "title": "Plus 年卡 会员 ROI 复盘",
+    "summary": "Plus 年卡 在样例模型中预估会员毛利为 197548.0，ROI 为 4.71x。",
+    "riskLevel": "low",
+    "keyDrivers": [
+      "Plus 年卡 在样例模型中具备正向收益，会员毛利可以覆盖权益成本。",
+      "样例数据中暂未发现严重成本或续费异常。"
+    ],
+    "recommendations": [
+      "Plus 年卡 当前 ROI 为 4.71x，预估 LTV 为 209.07。",
+      "样例模型下方案较健康，可以优先验证转化率和续费率。",
+      "样例数据中暂未发现阻塞性校验问题。",
+      "下一步实验：按高价值用户和价格敏感用户分层，对价格、优惠券数量和免邮上限做 A/B 测试。"
+    ],
+    "nextStep": "建议先做小范围灰度上线，对比预测 ROI、真实续费率和权益核销数据。"
+  }
+}

@@ -1,0 +1,12 @@
+plan_id,plan_name,period_months,price,target_members,coupon_value,coupon_count,shipping_benefit_cost,service_cost,expected_renewal_rate
+basic_monthly,Basic Monthly,1,19,1200,5,2,3,1,0.28
+plus_quarterly,Plus Quarterly,3,59,900,8,4,8,3,0.36
+plus_annual,Plus Annual,12,99,1000,10,6,18,5,0.46
+premium_annual,Premium Annual,12,199,420,20,8,36,18,0.52
+student_annual,Student Annual,12,69,680,8,5,14,4,0.38
+family_annual,Family Annual,12,249,260,25,10,48,22,0.44
+trial_monthly,Trial Monthly,1,9,1500,3,1,2,1,0.18
+vip_annual,VIP Annual,12,299,160,30,12,60,35,0.58
+city_plus,City Plus,12,129,520,12,8,28,8,0.42
+lite_annual,Lite Annual,12,49,1100,5,4,9,3,0.31
+
